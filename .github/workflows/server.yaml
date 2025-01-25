@@ -21,7 +21,7 @@ jobs:
 
     - name: Deploy Code to Server
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@SERVER_IP "
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ SERVER_KEY }}"
           rm -rf /var/www/html/* &&
           mkdir -p /var/www/html &&
           exit"
