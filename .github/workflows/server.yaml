@@ -1,28 +1,25 @@
-name: Deploy to Server
+name: Trigger Deploy Script on Private Server
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main  # Deploy when code is pushed to the main branch
+  workflow_dispatch:  # Manual trigger
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Specify the exact name of the self-hosted runner
+    runs-on: [self-hosted, ankush-runner]
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SERVER_KEY }}
+      - name: Set Up SSH Key
+        run: |
+          echo "${{ secrets.PRIVATE_SERVER_KEY }}" > private-server.pem
+          chmod 600 private-server.pem
 
-    - name: Deploy Code to Server
-      run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP }} "
-          sudo rm -rf /var/www/html/* &&
-          sudo mkdir -p /var/www/html
-        "
-        scp -r ./* ubuntu@${{ secrets.SERVER_IP }}:/var/www/html/
+      - name: Trigger Deploy Script on Private Server
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private-server.pem ${{ secrets.PRIVATE_SERVER_USER }}@${{ secrets.PRIVATE_SERVER_IP }} "bash /home/ubuntu/deploy.sh"
+
+      - name: Clean Up
+        run: rm -f private-server.pem
