@@ -6,7 +6,7 @@ on:
 jobs:
   deploy:
     # Specify the exact name of the self-hosted runner
-    runs-on: [self-hosted, ankush-runner]
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Code
